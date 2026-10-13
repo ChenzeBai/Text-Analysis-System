@@ -13,7 +13,7 @@ def find_file(path):
         print('Available text files:')
         files = os.listdir(path)
         for file in files:
-            if file.endswith('.txt') or file.endswith('.docx'):
+            if file.endswith('.txt'):
                 found = True
                 text_files.append(file)
                 print(f'{count}. {file}')
@@ -40,7 +40,7 @@ def correct_choose(result):
         return choose
 
 
-def analyse_text(selected_file_path):
+def analyse_text_basic(selected_file_path):
     word_list = []
     letter_count = 0
     with open(selected_file_path, 'r') as f:
@@ -55,6 +55,51 @@ def analyse_text(selected_file_path):
         print(f'The number of words in the file is: {len(word_list)}')
         print(f'The number of characters(including spaces and punctuation) in the file is: {letter_count}')
         print(f'The number of unique words is: {len(set(word_list))}')
+
+
+def analyse_text_word(selected_file_path):
+    word_lst = []
+    word_count = {}
+    first_most_common_word = None
+    second_most_common_word = None
+    third_most_common_word = None
+
+    first_most_common_count = 0
+    second_most_common_count = 0
+    third_most_common_count = 0
+    with open(selected_file_path, 'r') as file:
+        for line in file:
+            words = line.split()
+            for word in words:
+                word_cleaned = word.lower().strip('.,!?;:"()[]{}')
+                if word_cleaned != '':
+                    word_lst.append(word_cleaned)
+        for word in word_lst:
+            if word in word_count:
+                word_count[word] += 1
+            else:
+                word_count[word] = 1
+        for word in word_count:
+            if word_count[word] > first_most_common_count:
+                third_most_common_word = second_most_common_word
+                third_most_common_count = second_most_common_count
+                second_most_common_word = first_most_common_word
+                second_most_common_count = first_most_common_count
+                first_most_common_word = word
+                first_most_common_count = word_count[word]
+            elif word_count[word] > second_most_common_count and word != first_most_common_word:
+                third_most_common_word = second_most_common_word
+                third_most_common_count = second_most_common_count
+                second_most_common_word = word
+                second_most_common_count = word_count[word]
+            elif word_count[word] > third_most_common_count and word != first_most_common_word and word != second_most_common_word:
+                third_most_common_word = word
+                third_most_common_count = word_count[word]
+
+        print('The top three most common words in the file are:')
+        print(f'1. {first_most_common_word} (appears {first_most_common_count} times)')
+        print(f'2. {second_most_common_word} (appears {second_most_common_count} times)')
+        print(f'3. {third_most_common_word} (appears {third_most_common_count} times)')
 
 print('''
 ===========================================
@@ -85,8 +130,10 @@ while True:
         print('Please enter an integer from 1 to 9')
         continue
 
+
     match case:
         case 1:
+    
             print('Your choice: List available text files')
             path = input('Please enter the folder path: ')
             result = find_file(path)
@@ -96,6 +143,7 @@ while True:
                 selected_file = None
                 selected_file_path = None
                 selected_path = path
+
 
         case 2:
 
@@ -113,3 +161,11 @@ while True:
             print(f'Your choice is {result[choose]}')
             selected_file = result[choose]
             selected_file_path = os.path.join(path, selected_file)
+            print('File selected successfully!')
+
+        case 3:
+
+            print('''Basic Satatistics
+            ''============================
+            ''')
+            analyse_text_basic(selected_file_path)
