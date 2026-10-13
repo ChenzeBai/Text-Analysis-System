@@ -80,27 +80,64 @@ def analyse_text_word(selected_file_path):
             else:
                 word_count[word] = 1
         for word in word_count:
-            if word_count[word] > first_most_common_count:
+            if first_most_common_word is None:
+                first_most_common_word = word
+                first_most_common_count = word_count[word]
+            elif word_count[word] > first_most_common_count:
                 third_most_common_word = second_most_common_word
                 third_most_common_count = second_most_common_count
                 second_most_common_word = first_most_common_word
                 second_most_common_count = first_most_common_count
                 first_most_common_word = word
                 first_most_common_count = word_count[word]
-            elif word_count[word] > second_most_common_count and word != first_most_common_word:
-                third_most_common_word = second_most_common_word
-                third_most_common_count = second_most_common_count
-                second_most_common_word = word
-                second_most_common_count = word_count[word]
-            elif word_count[word] > third_most_common_count and word != first_most_common_word and word != second_most_common_word:
-                third_most_common_word = word
-                third_most_common_count = word_count[word]
+            elif word_count[word] == first_most_common_count:
+                if word not in first_most_common_word.split(','):
+                    first_most_common_word = first_most_common_word + ',' + word
+
+            if second_most_common_word is None:
+                if word not in first_most_common_word.split(','):
+                    second_most_common_word = word 
+                    second_most_common_count = word_count[word]
+            elif word_count[word] > second_most_common_count:
+                if word not in first_most_common_word.split(','):
+                    third_most_common_word = second_most_common_word
+                    third_most_common_count = second_most_common_count
+                    second_most_common_word = word
+                    second_most_common_count = word_count[word]
+            elif word_count[word] == second_most_common_count:
+                if word not in second_most_common_word.split(',') and word not in first_most_common_word.split(','):
+                        second_most_common_word = second_most_common_word + ',' + word
+
+            if third_most_common_word is None:
+                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(','):
+                    third_most_common_word = word
+                    third_most_common_count = word_count[word]
+            elif word_count[word] > third_most_common_count:    
+                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(',') and word not in third_most_common_word.split(','):
+                    third_most_common_count = word_count[word]
+                    third_most_common_word = word
+            elif word_count[word] == third_most_common_count: 
+                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(',') and word not in third_most_common_word.split(','): 
+                    third_most_common_word = third_most_common_word + ',' + word
 
         print('The top three most common words in the file are:')
         print(f'1. {first_most_common_word} (appears {first_most_common_count} times)')
         print(f'2. {second_most_common_word} (appears {second_most_common_count} times)')
         print(f'3. {third_most_common_word} (appears {third_most_common_count} times)')
+        
 
+
+def file_path_detector(selected_file_path):
+    if not selected_file_path:
+        selected_file_path = input('Please enter your document path that you want to analysis')
+    while not os.path.isfile(selected_file_path) or not selected_file_path.lower().endswith('.txt'):
+        print('File does not exist. Please enter a valid file path enns with .txt')
+        selected_file_path = input(
+            'Please enter your document path: '
+        )
+    
+    return selected_file_path
+    
 print('''
 ===========================================
     Welcome to The Text Analysis System!
@@ -166,14 +203,18 @@ while True:
 
         case 3:
 
+            selected_file_path = file_path_detector(selected_file_path)
             print('''
-Basic Satatistics
-============================
-            ''')
+    Basic Satatistics
+    ============================
+                ''')
             analyse_text_basic(selected_file_path)
+            
 
 
         case 4:
+            
+            selected_file_path = file_path_detector(selected_file_path)
             print('''
 word analysis
 =============================
