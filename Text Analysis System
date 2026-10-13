@@ -163,9 +163,19 @@ while True:
             selected_file_path = os.path.join(path, selected_file)
             print('File selected successfully!')
 
+
         case 3:
 
-            print('''Basic Satatistics
-            ''============================
+            print('''
+Basic Satatistics
+============================
             ''')
             analyse_text_basic(selected_file_path)
+
+
+        case 4:
+            print('''
+word analysis
+=============================
+                        ''')
+            analyse_text_word(selected_file_path)
