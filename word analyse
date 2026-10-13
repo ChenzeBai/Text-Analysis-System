@@ -1,0 +1,56 @@
+def analyse_text_word(selected_file_path):
+    word_count = {}
+
+    with open(selected_file_path, 'r') as file:
+        for line in file:
+            words = line.split()
+
+            for word in words:
+                word_cleaned = word.lower().strip('.,!?;:"()[]{}')
+
+                if word_cleaned != '':
+                    if word_cleaned in word_count:
+                        word_count[word_cleaned] += 1
+                    else:
+                        word_count[word_cleaned] = 1
+    
+    first_count = 0
+    second_count = 0
+    third_count = 0
+
+    for word in word_count:
+        if word_count[word] > first_count:
+            first_count = word_count[word]
+
+    for word in word_count:
+        if word_count[word] < first_count and word_count[word] > second_count:
+            second_count = word_count[word]
+
+    for word in word_count:
+        if word_count[word] < second_count and word_count[word] > third_count:
+            third_count = word_count[word]
+
+    first_words = []
+    second_words = []
+    third_words = []
+
+    for word in word_count:
+        if word_count[word] == first_count:
+            first_words.append(word)
+
+        elif word_count[word] == second_count:
+            second_words.append(word)
+
+        elif word_count[word] == third_count:
+            third_words.append(word)
+
+    print('The most common words in the file are:')
+
+    if first_words:
+        print(f"1. {', '.join(first_words)} (appears {first_count} times)")
+
+    if second_words:
+        print(f"2. {', '.join(second_words)} (appears {second_count} times)")
+
+    if third_words:
+        print(f"3. {', '.join(third_words)} (appears {third_count} times)")
