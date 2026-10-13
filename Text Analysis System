@@ -58,73 +58,61 @@ def analyse_text_basic(selected_file_path):
 
 
 def analyse_text_word(selected_file_path):
-    word_lst = []
     word_count = {}
-    first_most_common_word = None
-    second_most_common_word = None
-    third_most_common_word = None
 
-    first_most_common_count = 0
-    second_most_common_count = 0
-    third_most_common_count = 0
     with open(selected_file_path, 'r') as file:
         for line in file:
             words = line.split()
+
             for word in words:
                 word_cleaned = word.lower().strip('.,!?;:"()[]{}')
+
                 if word_cleaned != '':
-                    word_lst.append(word_cleaned)
-        for word in word_lst:
-            if word in word_count:
-                word_count[word] += 1
-            else:
-                word_count[word] = 1
-        for word in word_count:
-            if first_most_common_word is None:
-                first_most_common_word = word
-                first_most_common_count = word_count[word]
-            elif word_count[word] > first_most_common_count:
-                third_most_common_word = second_most_common_word
-                third_most_common_count = second_most_common_count
-                second_most_common_word = first_most_common_word
-                second_most_common_count = first_most_common_count
-                first_most_common_word = word
-                first_most_common_count = word_count[word]
-            elif word_count[word] == first_most_common_count:
-                if word not in first_most_common_word.split(','):
-                    first_most_common_word = first_most_common_word + ',' + word
+                    if word_cleaned in word_count:
+                        word_count[word_cleaned] += 1
+                    else:
+                        word_count[word_cleaned] = 1
+    
+    first_count = 0
+    second_count = 0
+    third_count = 0
 
-            if second_most_common_word is None:
-                if word not in first_most_common_word.split(','):
-                    second_most_common_word = word 
-                    second_most_common_count = word_count[word]
-            elif word_count[word] > second_most_common_count:
-                if word not in first_most_common_word.split(','):
-                    third_most_common_word = second_most_common_word
-                    third_most_common_count = second_most_common_count
-                    second_most_common_word = word
-                    second_most_common_count = word_count[word]
-            elif word_count[word] == second_most_common_count:
-                if word not in second_most_common_word.split(',') and word not in first_most_common_word.split(','):
-                        second_most_common_word = second_most_common_word + ',' + word
+    for word in word_count:
+        if word_count[word] > first_count:
+            first_count = word_count[word]
 
-            if third_most_common_word is None:
-                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(','):
-                    third_most_common_word = word
-                    third_most_common_count = word_count[word]
-            elif word_count[word] > third_most_common_count:    
-                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(',') and word not in third_most_common_word.split(','):
-                    third_most_common_count = word_count[word]
-                    third_most_common_word = word
-            elif word_count[word] == third_most_common_count: 
-                if word not in first_most_common_word.split(',') and word not in second_most_common_word.split(',') and word not in third_most_common_word.split(','): 
-                    third_most_common_word = third_most_common_word + ',' + word
+    for word in word_count:
+        if word_count[word] < first_count and word_count[word] > second_count:
+            second_count = word_count[word]
 
-        print('The top three most common words in the file are:')
-        print(f'1. {first_most_common_word} (appears {first_most_common_count} times)')
-        print(f'2. {second_most_common_word} (appears {second_most_common_count} times)')
-        print(f'3. {third_most_common_word} (appears {third_most_common_count} times)')
-        
+    for word in word_count:
+        if word_count[word] < second_count and word_count[word] > third_count:
+            third_count = word_count[word]
+
+    first_words = []
+    second_words = []
+    third_words = []
+
+    for word in word_count:
+        if word_count[word] == first_count:
+            first_words.append(word)
+
+        elif word_count[word] == second_count:
+            second_words.append(word)
+
+        elif word_count[word] == third_count:
+            third_words.append(word)
+
+    print('The most common words in the file are:')
+
+    if first_words:
+        print(f"1. {', '.join(first_words)} (appears {first_count} times)")
+
+    if second_words:
+        print(f"2. {', '.join(second_words)} (appears {second_count} times)")
+
+    if third_words:
+        print(f"3. {', '.join(third_words)} (appears {third_count} times)")
 
 
 def file_path_detector(selected_file_path):
