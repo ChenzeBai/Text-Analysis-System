@@ -123,8 +123,16 @@ def file_path_detector(selected_file_path):
         selected_file_path = input(
             'Please enter your document path: '
         )
-    
+
     return selected_file_path
+
+
+def sentence_analysis(selected_file_path);
+    sentences = []
+    with open(selected_file_path, 'r') as f:
+        for line in f:
+            sentence = line.split('.?!:')
+            sentences.append(sentence)
     
 print('''
 ===========================================
@@ -208,3 +216,7 @@ word analysis
 =============================
                         ''')
             analyse_text_word(selected_file_path)
+
+
+
+        case 5:
