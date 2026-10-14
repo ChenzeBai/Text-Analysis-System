@@ -127,12 +127,24 @@ def file_path_detector(selected_file_path):
     return selected_file_path
 
 
-def sentence_analysis(selected_file_path);
+def analyse_text_sentence(selected_file_path):
     sentences = []
     with open(selected_file_path, 'r') as f:
         for line in f:
-            sentence = line.split('.?!:')
-            sentences.append(sentence)
+            sentence = '' 
+
+            for text in line:
+                if text == '.' or text == '?' or text == '!':
+                    if sentence.strip() != '': 
+                        sentences.append(sentence.strip())
+                    sentence = ''
+                else:
+                    sentence += text
+
+            if sentence.strip() != '':
+                sentences.append(sentence.strip())
+
+    print(f'The number of sentences is {len(sentences)}')
     
 print('''
 ===========================================
@@ -201,9 +213,9 @@ while True:
 
             selected_file_path = file_path_detector(selected_file_path)
             print('''
-    Basic Satatistics
-    ============================
-                ''')
+Basic Satatistics
+============================
+            ''')
             analyse_text_basic(selected_file_path)
             
 
@@ -213,10 +225,17 @@ while True:
             selected_file_path = file_path_detector(selected_file_path)
             print('''
 word analysis
-=============================
-                        ''')
+============================
+            ''')
             analyse_text_word(selected_file_path)
 
 
 
         case 5:
+
+            selected_file_path = file_path_detector(selected_file_path)
+            print('''
+sentence analysis
+=============================
+            ''')
+            analyse_text_sentence(selected_file_path)
