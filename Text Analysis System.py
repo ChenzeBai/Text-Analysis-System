@@ -47,6 +47,8 @@ def analyse_text_basic(selected_file_path):
     word_list = []
     letter_count = 0
     letter_count_space = 0
+    line_count = 0
+    letter_count_space = 0
     with open(selected_file_path, 'r') as f:
         for line in f:
             line_count += 1
@@ -58,11 +60,15 @@ def analyse_text_basic(selected_file_path):
                 if cleaned_word != '':
                     word_list.append(cleaned_word)
         if line_count != 0:
-            average_line_word = len(word_list) / line_count
-            average_line_letter = len(letter_count) / len(word_list) 
+            average_line_word = len(word_list) / line_count 
         else:
             average_line_word = 0
+            
+        if len(word_list) != 0:
+            average_line_letter = letter_count / len(word_list)
+        else:
             average_line_letter = 0
+        
         print(f'The number of words in the file is: {len(word_list)}')
         print(f'The number of characters(including spaces) in the file is: {letter_count_space}')
         print(f'The number of characters(NOT including spaces) in the file is: {letter_count}')
@@ -232,6 +238,22 @@ def unique_word_analysis(selected_file_path):
     print(f'The number of unique word is {len(word_lst)}')
     print(f'The number of words appearing only once is {count}')
 
+
+#case4 句子长度分布
+def word_length_distribution(selected_file_path):
+    word_length = {}
+    with open(selected_file_path,'r') as f:
+        for line in f:
+            words = line.split()
+            for word in words:
+                word = word.strip('.,!?;:"()[]{}\'')
+                if word != '': 
+                    if len(word) in word_length:
+                        word_length[len(word)] += 1
+                    else:
+                        word_length[len(word)] = 1
+    for length in word_length:
+        print(f'There are {word_length[length]} words that length is {[length]}')
 
 
 #路径查找
