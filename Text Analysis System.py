@@ -469,3 +469,4 @@ sentence analysis
 character analysis
 =============================
             ''')
+            character_analysis(selected_file_path)
