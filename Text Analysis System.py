@@ -1,5 +1,6 @@
 import os
 import string
+import matplotlib.pyplot as plt
 
 selected_file = None
 selected_path = None
@@ -81,7 +82,6 @@ def analyse_text_basic(selected_file_path):
     print(f'The average letter in each word is {average_line_letter}')
     print(f'The number of lines in the file is: {line_count}')
     return word_list
-cleaned_word = analyse_text_basic(selected_file_path)
 
 
 
@@ -224,7 +224,7 @@ def analyse_text_word(selected_file_path):
 
     if tenth_words:
         print(f"10. {', '.join(tenth_words)} (appears {tenth_count} times)")
-
+    return word_count
 
 
 #case4 不重复单词以及只出现一次单词数
@@ -274,6 +274,7 @@ def word_length_distribution(selected_file_path):
                         word_length[len(word)] = 1
     for length in word_length:
         print(f'There are {word_length[length]} words that length is {length}')
+    return word_length
 
 
 #case5 句子查找
@@ -363,6 +364,49 @@ def character_analysis(selected_file_path):
         print(f'Letter {char}: {library_upper[char]}')
     print(f'There are {sum(library_punctuation.values())} punctuations')
 
+
+#case7 图表
+def visualise_statistics(selected_file_path):
+    word_count = analyse_text_word(selected_file_path)
+
+    length_count = word_length_distribution(selected_file_path)
+
+    #前十单词
+    sorted_words = sorted(
+        word_count,
+        key=word_count.get,
+        reverse=True
+    )
+
+    top_words = sorted_words[:10]
+    top_counts = []
+
+    for word in top_words:
+        top_counts.append(word_count[word])
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(top_words, top_counts)
+    plt.title('Top 10 Most Frequent Words')
+    plt.xlabel('Words')
+    plt.ylabel('Frequency')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+    #长度
+    lengths = sorted(length_count)
+    counts = []
+
+    for length in lengths:
+        counts.append(length_count[length])
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(lengths, counts)
+    plt.title('Word Length Distribution')
+    plt.xlabel('Word Length')
+    plt.ylabel('Number of Words')
+    plt.tight_layout()
+    plt.show()
 
 
 print('''
@@ -470,3 +514,12 @@ character analysis
 =============================
             ''')
             character_analysis(selected_file_path)
+
+
+        case 7:
+            selected_file_path = file_path_detector(selected_file_path)
+            print('''
+visualise_statistics
+=============================
+            ''')
+            visualise_statistics(selected_file_path)
