@@ -1,6 +1,7 @@
 import os
 import string
 import matplotlib.pyplot as plt
+import json
 
 selected_file = None
 selected_path = None
@@ -65,12 +66,12 @@ def analyse_text_basic(selected_file_path):
                     word_list.append(cleaned_word)
                     word_length_count += len(cleaned_word)
         if line_count != 0:
-            average_line_word = round(len(word_list) / line_count)
+            average_line_word = round(len(word_list) / line_count, 2)
         else:
             average_line_word = 0
             
         if len(word_list) != 0:
-            average_line_letter = round(letter_count / len(word_list))
+            average_line_letter = round(letter_count / len(word_list), 2)
         else:
             average_line_letter = 0
         
@@ -81,7 +82,17 @@ def analyse_text_basic(selected_file_path):
     print(f'The average words in each line is {average_line_word}')
     print(f'The average letter in each word is {average_line_letter}')
     print(f'The number of lines in the file is: {line_count}')
-    return word_list
+    basic_stats = {
+    'total_words': len(word_list),
+    'total_characters_including_spaces': letter_count_space,
+    'total_characters_excluding_whitespace': letter_count,
+    'unique_words': len(set(word_list)),
+    'average_words_per_line': average_line_word,
+    'average_characters_per_word': average_line_letter,
+    'total_lines': line_count
+    }
+
+    return basic_stats
 
 
 
@@ -102,130 +113,16 @@ def analyse_text_word(selected_file_path):
                     else:
                         word_count[word_cleaned] = 1
     
-    first_count = 0
-    second_count = 0
-    third_count = 0
-    fourth_count = 0
-    fifth_count = 0
-    sixth_count = 0
-    seventh_count = 0
-    eighth_count = 0
-    ninth_count = 0
-    tenth_count = 0
-    for word in word_count:
-        if word_count[word] > first_count:
-            first_count = word_count[word]
+        sorted_words = sorted(word_count, key=word_count.get, reverse=True)
+        top_words = sorted_words[:10]
 
-    for word in word_count:
-        if word_count[word] < first_count and word_count[word] > second_count:
-            second_count = word_count[word]
+        print('The most common words in the file are:')
 
-    for word in word_count:
-        if word_count[word] < second_count and word_count[word] > third_count:
-            third_count = word_count[word]
+        for i in range(len(top_words)):
+            word = top_words[i]
+            print(f"{i + 1}. {word} (appears {word_count[word]} times)")
 
-    for word in word_count:
-        if word_count[word] < third_count and word_count[word] > fourth_count:
-            fourth_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < fourth_count and word_count[word] > fifth_count:
-            fifth_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < fifth_count and word_count[word] > sixth_count:
-            sixth_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < sixth_count and word_count[word] > seventh_count:
-            seventh_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < seventh_count and word_count[word] > eighth_count:
-            eighth_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < eighth_count and word_count[word] > ninth_count:
-            ninth_count = word_count[word]
-
-    for word in word_count:
-        if word_count[word] < ninth_count and word_count[word] > tenth_count:
-            tenth_count = word_count[word]
-    
-    first_words = []
-    second_words = []
-    third_words = []
-    fourth_words = []
-    fifth_words = []
-    sixth_words = []
-    seventh_words = []
-    eighth_words = []
-    ninth_words = []
-    tenth_words = []
-    for word in word_count:
-        if word_count[word] == first_count:
-            first_words.append(word)
-
-        elif word_count[word] == second_count:
-            second_words.append(word)
-
-        elif word_count[word] == third_count:
-            third_words.append(word)
-
-        elif word_count[word] == fourth_count:
-            fourth_words.append(word)
-
-        elif word_count[word] == fifth_count:
-            fifth_words.append(word)
-
-        elif word_count[word] == sixth_count:
-            sixth_words.append(word)
-
-        elif word_count[word] == seventh_count:
-            seventh_words.append(word)
-
-        elif word_count[word] == eighth_count:
-            eighth_words.append(word)
-
-        elif word_count[word] == ninth_count:
-            ninth_words.append(word)
-
-        elif word_count[word] == tenth_count:
-            tenth_words.append(word)
-
-    print('The most common words in the file are:')
-
-    if first_words:
-        print(f"1. {', '.join(first_words)} (appears {first_count} times)")
-
-    if second_words:
-        print(f"2. {', '.join(second_words)} (appears {second_count} times)")
-
-    if third_words:
-        print(f"3. {', '.join(third_words)} (appears {third_count} times)")
-
-    if fourth_words:
-        print(f"4. {', '.join(fourth_words)} (appears {fourth_count} times)")
-
-    if fifth_words:
-        print(f"5. {', '.join(fifth_words)} (appears {fifth_count} times)")
-
-    if sixth_words:
-        print(f"6. {', '.join(sixth_words)} (appears {sixth_count} times)")
-
-    if seventh_words:
-        print(f"7. {', '.join(seventh_words)} (appears {seventh_count} times)")
-
-    if eighth_words:
-        print(f"8. {', '.join(eighth_words)} (appears {eighth_count} times)")
-
-    if ninth_words:
-        print(f"9. {', '.join(ninth_words)} (appears {ninth_count} times)")
-
-    if tenth_words:
-        print(f"10. {', '.join(tenth_words)} (appears {tenth_count} times)")
     return word_count
-
 
 #case4 不重复单词以及只出现一次单词数
 def unique_word_analysis(selected_file_path):
@@ -236,15 +133,20 @@ def unique_word_analysis(selected_file_path):
             words = line.split()
             for word in words:
                 cleaned_word = word.strip('.,!?;:"()[]{}\'').lower()
-                if cleaned_word in word_lst:
-                    word_lst[cleaned_word] += 1
-                else:
-                    word_lst[cleaned_word] = 1
+                if cleaned_word != '':
+                    if cleaned_word in word_lst:
+                        word_lst[cleaned_word] += 1
+                    else:
+                        word_lst[cleaned_word] = 1
     for word in word_lst:    
         if word_lst[word] == 1:
             count += 1
     print(f'The number of unique word is {len(word_lst)}')
     print(f'The number of words appearing only once is {count}')
+    return {
+    'unique_words': len(word_lst),
+    'words_appearing_once': count
+    }
 
 #路径查找
 def file_path_detector(selected_file_path):
@@ -266,7 +168,7 @@ def word_length_distribution(selected_file_path):
         for line in f:
             words = line.split()
             for word in words:
-                word = word.strip('.,!?;:"()[]{}\'')
+                word = word.lower().strip('.,!?;:"()[]{}\'')
                 if word != '': 
                     if len(word) in word_length:
                         word_length[len(word)] += 1
@@ -296,6 +198,7 @@ def analyse_text_sentence(selected_file_path):
                 sentences.append(sentence.strip())
 
     print(f'The number of sentences is {len(sentences)}')
+    return sentences
 
 #case5 最长/短句子
 def longest_shortest_sentence(selected_file_path):
@@ -319,16 +222,22 @@ def longest_shortest_sentence(selected_file_path):
         if len(sentence_list) == 0:
                 print('No sentences')
                 return
-        shortest_length = len(sentence_list[0])
+        shortest_length = 99999
         for sentence in sentence_list:
             if len(sentence) > longest_length:
                     longest_length = len(sentence)
                     longest_sentence = sentence
-            if len(sentence) < shortest_length and len(sentence) > 2:
+            if len(sentence) < shortest_length:
                     shortest_length = len(sentence)
                     shortest_sentence = sentence
     print(f'The longest sentence is: {longest_sentence} for {longest_length} characters')
     print(f'The shortest sentence is {shortest_sentence} for {shortest_length} characters')
+    return {
+    'longest_sentence': longest_sentence,
+    'longest_sentence_length': longest_length,
+    'shortest_sentence': shortest_sentence,
+    'shortest_sentence_length': shortest_length
+}
 
 
 #case6 字符分析
@@ -363,12 +272,16 @@ def character_analysis(selected_file_path):
     for char in sorted(library_upper):
         print(f'Letter {char}: {library_upper[char]}')
     print(f'There are {sum(library_punctuation.values())} punctuations')
+    return {
+    'lowercase_letters': library_basic,
+    'uppercase_letters': library_upper,
+    'punctuation': library_punctuation
+}
 
 
 #case7 图表
 def visualise_statistics(selected_file_path):
     word_count = analyse_text_word(selected_file_path)
-
     length_count = word_length_distribution(selected_file_path)
 
     #前十单词
@@ -389,7 +302,6 @@ def visualise_statistics(selected_file_path):
     plt.title('Top 10 Most Frequent Words')
     plt.xlabel('Words')
     plt.ylabel('Frequency')
-    plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
 
@@ -407,6 +319,34 @@ def visualise_statistics(selected_file_path):
     plt.ylabel('Number of Words')
     plt.tight_layout()
     plt.show()
+
+
+#case8 json
+def export_statistics(selected_file_path):
+    basic_stats = analyse_text_basic(selected_file_path)
+    word_count = analyse_text_word(selected_file_path)
+    length_count = word_length_distribution(selected_file_path)
+    character_stats = character_analysis(selected_file_path)
+    unique_stats = unique_word_analysis(selected_file_path)
+    sentences = analyse_text_sentence(selected_file_path)
+    sentence_stats = longest_shortest_sentence(selected_file_path)
+
+    statistics = {
+    'basic_statistics': basic_stats,
+    'word_frequency': word_count,
+    'word_length_distribution': length_count,
+    'character_analysis': character_stats,
+    'unique_word_analysis': unique_stats,
+    'sentence_count': len(sentences),
+    'sentence_analysis': sentence_stats
+}
+
+    output_path = os.path.splitext(selected_file_path)[0] + '_statistics.json'
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(statistics, f, indent=4, ensure_ascii=False)
+
+    print(f'Statistics exported successfully to: {output_path}')
 
 
 print('''
@@ -523,3 +463,17 @@ visualise_statistics
 =============================
             ''')
             visualise_statistics(selected_file_path)
+
+
+        case 8:
+            selected_file_path = file_path_detector(selected_file_path)
+            print('''
+Saving...
+=============================
+            ''')
+            export_statistics(selected_file_path)
+
+
+        case 9:
+            print('Exiting, Goodbye!')
+            break
