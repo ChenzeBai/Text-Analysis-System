@@ -228,10 +228,10 @@ def longest_shortest_sentence(selected_file_path):
                 return
         shortest_length = 99999
         for sentence in sentence_list:
-            if len(sentence) > longest_length:
+            if len(sentence) > longest_length and any(char.isalnum() for char in sentence):
                     longest_length = len(sentence)
                     longest_sentence = sentence
-            if len(sentence) < shortest_length:
+            if len(sentence) < shortest_length and any(char.isalnum() for char in sentence):
                     shortest_length = len(sentence)
                     shortest_sentence = sentence
     print(f'The longest sentence is: {longest_sentence} for {longest_length} characters')
