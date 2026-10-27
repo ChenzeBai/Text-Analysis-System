@@ -71,7 +71,7 @@ def analyse_text_basic(selected_file_path):
             average_line_word = 0
             
         if len(word_list) != 0:
-            average_line_letter = round(letter_count / len(word_list), 2)
+            average_line_letter = round(word_length_count / len(word_list), 2)
         else:
             average_line_letter = 0
         
