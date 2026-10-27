@@ -161,31 +161,35 @@ def file_path_detector(selected_file_path):
     return selected_file_path
 
 
-#case5 句子长度分布
+#case4 单词长度分布
 def word_length_distribution(selected_file_path):
     word_length = {}
-    with open(selected_file_path,'r') as f:
+
+    with open(selected_file_path, 'r') as f:
         for line in f:
             words = line.split()
+
             for word in words:
                 word = word.lower().strip('.,!?;:"()[]{}\'')
-                if word != '': 
-                    if len(word) in word_length:
-                        word_length[len(word)] += 1
-                    else:
-                        word_length[len(word)] = 1
-    for length in word_length:
-        print(f'There are {word_length[length]} words that length is {length}')
-    return word_length
+                
+                if word != '':
+                    length = len(word)
 
+                    if length in word_length:
+                        word_length[length] += 1
+                    else:
+                        word_length[length] = 1
+
+    for length in sorted(word_length):
+        print(f'There are {word_length[length]} words with length {length}')
+    return word_length
 
 #case5 句子查找
 def analyse_text_sentence(selected_file_path):
     sentences = []
+    sentence = ''
     with open(selected_file_path, 'r') as f:
         for line in f:
-            sentence = '' 
-
             for text in line:
                 if text == '.' or text == '?' or text == '!':
                     if sentence.strip() != '': 
@@ -194,8 +198,8 @@ def analyse_text_sentence(selected_file_path):
                 else:
                     sentence += text
 
-            if sentence.strip() != '':
-                sentences.append(sentence.strip())
+        if sentence.strip() != '':
+            sentences.append(sentence.strip())
 
     print(f'The number of sentences is {len(sentences)}')
     return sentences
@@ -211,7 +215,7 @@ def longest_shortest_sentence(selected_file_path):
             sentence = ''
             for char in line:
                 if char == '.' or char == '?' or char == '!':
-                    if sentence.strip() != '':
+                    if sentence.strip() != ''and any(char.isalnum() for char in sentence):
                         sentence_list.append(sentence.strip())
                     sentence = ''
                 else:
