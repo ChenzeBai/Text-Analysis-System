@@ -45,6 +45,15 @@ def correct_choose(result):
         return choose
 
 
+#case2 分析中
+def line_counter(selected_file_path):
+    count = 0
+    with open(selected_file_path,'r') as f:
+        for line in f:
+            count += 1
+
+    return count
+
 #case3 基础统计
 def analyse_text_basic(selected_file_path):
     word_list = []
@@ -395,15 +404,16 @@ def export_statistics(selected_file_path):
 
     print(f'Statistics exported successfully to: {output_path}')
 
-
 print('''
-===========================================
-    Welcome to The Text Analysis System!
-===========================================
+Welcome to The Text Analysis System!
+This programme analyses text files and provides statistical insights.
 ''')
 
 while True:
     print('''
+===================================
+            Text Analyser
+===================================
 1. List available text files
 2. Select and analyse a text file
 3. Show basic statistics
@@ -414,6 +424,12 @@ while True:
 8. Export statistics
 9. Exit
 ''')
+    if selected_file_path:
+        print(f'Current file: {selected_file_path}')
+    else:
+        print('No file loaded')
+
+
     try:
         case = int(input('Enter your choice: '))
 
@@ -456,15 +472,20 @@ while True:
             print(f'Your choice is {result[choose]}')
             selected_file = result[choose]
             selected_file_path = os.path.join(path, selected_file)
+
+            line_count = line_counter(selected_file_path)
+
+            print(f'Analysing "{selected_file_path}"...')
+            print(f'Analysis complete! Processed {line_count} lines.')
             print('File selected successfully!')
 
-
+            line_counter(selected_file_path)
         case 3:
 
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
-Basic Satatistics
-============================
+            print(f'''
+Basic Satatistics for {selected_file_path}
+================================================
             ''')
             analyse_text_basic(selected_file_path)
             
@@ -473,9 +494,9 @@ Basic Satatistics
         case 4:
             
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
-word analysis
-============================
+            print(f'''
+word analysis for {selected_file_path}
+================================================
             ''')
             analyse_text_word(selected_file_path)
             unique_word_analysis(selected_file_path)
@@ -486,9 +507,9 @@ word analysis
         case 5:
 
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
-sentence analysis
-=============================
+            print(f'''
+sentence analysis for {selected_file_path}
+================================================
             ''')
             analyse_text_sentence(selected_file_path)
             longest_shortest_sentence(selected_file_path)
@@ -496,27 +517,27 @@ sentence analysis
 
         case 6:
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
-character analysis
-=============================
+            print(f'''
+character analysis for {selected_file_path}
+================================================
             ''')
             character_analysis(selected_file_path)
 
 
         case 7:
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
-visualise_statistics
-=============================
+            print(f''' 
+visualise_statistics for {selected_file_path}
+================================================
             ''')
             visualise_statistics(selected_file_path)
 
 
         case 8:
             selected_file_path = file_path_detector(selected_file_path)
-            print('''
+            print( '''
 Saving...
-=============================
+================================================
             ''')
             export_statistics(selected_file_path)
 
