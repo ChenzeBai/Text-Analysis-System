@@ -151,7 +151,7 @@ def unique_word_analysis(selected_file_path):
 #路径查找
 def file_path_detector(selected_file_path):
     if not selected_file_path:
-        selected_file_path = input('Please enter your document path that you want to analysis')
+        selected_file_path = input('Please enter your document path that you want to analysis: ')
     while not os.path.isfile(selected_file_path) or not selected_file_path.lower().endswith('.txt'):
         print('File does not exist. Please enter a valid file path enns with .txt')
         selected_file_path = input(
@@ -210,13 +210,14 @@ def longest_shortest_sentence(selected_file_path):
     longest_length = 0
     longest_sentence = ''
     shortest_sentence = ''
+    sentence_library = {}
     with open(selected_file_path,'r') as f:
         for line in f:
             sentence = ''
             for char in line:
                 if char == '.' or char == '?' or char == '!':
                     if sentence.strip() != ''and any(char.isalnum() for char in sentence):
-                        sentence_list.append(sentence.strip())
+                        sentence_list.append(sentence.strip()) 
                     sentence = ''
                 else:
                     sentence += char
@@ -231,16 +232,22 @@ def longest_shortest_sentence(selected_file_path):
             if len(sentence) > longest_length and any(char.isalnum() for char in sentence):
                     longest_length = len(sentence)
                     longest_sentence = sentence
-            if len(sentence) < shortest_length and any(char.isalnum() for char in sentence):
+            if len(sentence) < shortest_length and any(char.isalnum() for char in sentence) and len(sentence) > 1:
                     shortest_length = len(sentence)
                     shortest_sentence = sentence
-    print(f'The longest sentence is: {longest_sentence} for {longest_length} characters')
-    print(f'The shortest sentence is {shortest_sentence} for {shortest_length} characters')
+        for sentence in sentence_list:
+            if len(sentence) in sentence_library:
+                sentence_library[len(sentence)] += 1
+            else:
+                sentence_library[len(sentence)] = 1
+    print(f'The longest sentence is: "{longest_sentence}" for {longest_length} characters')
+    print(f'The shortest sentence is "{shortest_sentence}" for {shortest_length} characters')
     return {
     'longest_sentence': longest_sentence,
     'longest_sentence_length': longest_length,
     'shortest_sentence': shortest_sentence,
-    'shortest_sentence_length': shortest_length
+    'shortest_sentence_length': shortest_length,
+    'sentence_library' : sentence_library
 }
 
 
@@ -321,6 +328,42 @@ def visualise_statistics(selected_file_path):
     plt.title('Word Length Distribution')
     plt.xlabel('Word Length')
     plt.ylabel('Number of Words')
+    plt.tight_layout()
+    plt.show()
+
+    #字母
+    library = character_analysis(selected_file_path)
+    lower_library = library["lowercase_letters"]
+
+    sorted_lower = sorted(
+                lower_library,
+                key=lower_library.get,
+                reverse=True
+            )
+    top_letters = sorted_lower[:26]
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(top_letters, [lower_library[letter]for letter in top_letters])
+    plt.title('Lowercase letters')
+    plt.xlabel('letters')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+    plt.show()
+
+    #句子
+    result = longest_shortest_sentence(selected_file_path)
+    length = result['sentence_library']
+    count = []
+
+    length_sentence = sorted(length)
+    for sentence_length in length_sentence:
+        count.append(length[sentence_length])
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(length_sentence, count)
+    plt.title('Sentences Length Distribution')
+    plt.xlabel('Sentences Length')
+    plt.ylabel('Frequency')
     plt.tight_layout()
     plt.show()
 
