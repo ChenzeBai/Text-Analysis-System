@@ -8,6 +8,9 @@ selected_path = None
 selected_file_path = None
 
 
+#暂停
+def pasue_choice():
+    input('Press Enter to continue...')
 #路径
 def find_file(path):
     count = 1
@@ -84,21 +87,15 @@ def analyse_text_basic(selected_file_path):
         else:
             average_line_letter = 0
         
-    print(f'The number of words in the file is: {len(word_list)}')
-    print(f'The number of characters(including spaces) in the file is: {letter_count_space}')
-    print(f'The number of characters(NOT including spaces) in the file is: {letter_count}')
-    print(f'The number of unique words is: {len(set(word_list))}')
-    print(f'The average words in each line is {average_line_word}')
-    print(f'The average letter in each word is {average_line_letter}')
-    print(f'The number of lines in the file is: {line_count}')
+    
     basic_stats = {
     'total_words': len(word_list),
-    'total_characters_including_spaces': letter_count_space,
-    'total_characters_excluding_whitespace': letter_count,
+    'letter_count_space': letter_count_space,
+    'letter_count': letter_count,
     'unique_words': len(set(word_list)),
-    'average_words_per_line': average_line_word,
-    'average_characters_per_word': average_line_letter,
-    'total_lines': line_count
+    'average_line_word': average_line_word,
+    'average_line_letter': average_line_letter,
+    'line_count': line_count
     }
 
     return basic_stats
@@ -249,8 +246,7 @@ def longest_shortest_sentence(selected_file_path):
                 sentence_library[len(sentence)] += 1
             else:
                 sentence_library[len(sentence)] = 1
-    print(f'The longest sentence is: "{longest_sentence}" for {longest_length} characters')
-    print(f'The shortest sentence is "{shortest_sentence}" for {shortest_length} characters')
+
     return {
     'longest_sentence': longest_sentence,
     'longest_sentence_length': longest_length,
@@ -404,6 +400,125 @@ def export_statistics(selected_file_path):
 
     print(f'Statistics exported successfully to: {output_path}')
 
+#case9 可读性(句子，单词)
+def readabilty_analysis(selected_file_path):
+    result = longest_shortest_sentence(selected_file_path)
+    sentence_library = result["sentence_library"]
+    sentence_amount = sum(sentence_library.values())
+
+    word_amount = 0
+    with open(selected_file_path, 'r') as f:
+        for line in f:
+            words = line.split()
+        
+            for word in words:
+                word = word.lower().strip('.,!?;:"()[]{}\'')
+                if word != '':
+                    word_amount += 1
+    return word_amount, sentence_amount
+
+
+#case9 可读性(音节)
+def count_syllables(selected_file_path):
+    with open(selected_file_path, 'r') as f:
+        syllable_amount = 0
+        word_lst = []
+        
+
+        for line in f:
+            words = line.split()
+                
+            for word in words:
+                word = word.lower().strip('.,!?;:"()[]{}\'')
+                word_lst.append(word)
+
+        for word in word_lst:
+            previous_vowel = False
+
+            if word != '':
+                for letter in word:
+                    if letter in 'aeiou':
+                        if not previous_vowel:
+                            syllable_amount += 1
+                        previous_vowel = True
+                    else:
+                        previous_vowel = False
+                if word.endswith('e') and not word.endswith('le') and not word.endswith('er'):
+                    syllable_amount -= 1
+    return syllable_amount
+
+#case9 Flesch Reading Ease算法
+def flesch_reading_ease(selected_file_path):
+    word_amount, sentence_amount = readabilty_analysis(selected_file_path)
+    syllable_amount = count_syllables(selected_file_path)
+
+    readable_score_flesch = 206.835 - 1.015 * (word_amount / sentence_amount) - 84.6 * (syllable_amount / word_amount)
+    return readable_score_flesch
+
+
+#case9 LIX 算法
+def LIX(selected_file_path):
+    word_amount, sentence_amount = readabilty_analysis(selected_file_path)
+    with open(selected_file_path, 'r') as f:
+        long_word_count = 0
+    
+        for line in f:
+            words = line.split()
+                    
+            for word in words:
+                word = word.lower().strip('.,!?;:"()[]{}\'')
+                if len(word) > 6:
+                    long_word_count += 1
+
+    if sentence_amount == 0 or word_amount == 0:
+        return None
+    
+    readable_score_LIX = (word_amount / sentence_amount) + (long_word_count * 100 / word_amount)
+    return readable_score_LIX
+
+
+#难度检测
+def difficulty_dector_flesch(readable_score_flesch):
+    if readable_score_flesch >= 90:
+        difficulty_flesch = 'Very Easy'
+
+    elif readable_score_flesch >= 80:
+        difficulty_flesch = 'Easy'
+
+    elif readable_score_flesch >= 70:
+        difficulty_flesch = 'Fairly Ease'
+
+    elif readable_score_flesch >= 60:
+        difficulty_flesch = 'Standard'
+
+    elif readable_score_flesch >= 50:
+        difficulty_flesch = 'Fairly Difficult'
+
+    elif readable_score_flesch >= 30:
+        difficulty_flesch = 'Difficult'
+
+    else:
+        difficulty_flesch ='Very Difficult'
+    
+    return difficulty_flesch
+
+def difficulty_dector_LIX(readable_score_LIX):
+    if readable_score_LIX > 50:
+        difficulty_LIX = 'Very Difficult'
+
+    elif readable_score_LIX > 40:
+        difficulty_LIX = 'Difficult'
+        
+    elif readable_score_LIX > 30:
+        difficulty_LIX = 'Medium'
+
+    elif readable_score_LIX > 25:
+        difficulty_LIX = 'Easy'
+
+    else:
+        difficulty_LIX = 'Very Easy'
+
+    return difficulty_LIX
 print('''
 Welcome to The Text Analysis System!
 This programme analyses text files and provides statistical insights.
@@ -422,7 +537,8 @@ while True:
 6. Show character analysis
 7. Visualise statistics
 8. Export statistics
-9. Exit
+9. Readable score
+10. Exit
 ''')
     if selected_file_path:
         print(f'Current file: {selected_file_path}')
@@ -437,7 +553,7 @@ while True:
         print('Please enter an integer from 1 to 9')
         continue
     
-    if case < 1 or case > 9:
+    if case < 1 or case > 10:
         print('Please enter an integer from 1 to 9')
         continue
 
@@ -449,11 +565,13 @@ while True:
             path = input('Please enter the folder path: ')
             result = find_file(path)
             if not result:
+                pasue_choice()
                 continue
             else:
                 selected_file = None
                 selected_file_path = None
                 selected_path = path
+            pasue_choice()
 
 
         case 2:
@@ -480,6 +598,9 @@ while True:
             print('File selected successfully!')
 
             line_counter(selected_file_path)
+            pasue_choice()
+
+
         case 3:
 
             selected_file_path = file_path_detector(selected_file_path)
@@ -487,8 +608,25 @@ while True:
 Basic Satatistics for {selected_file_path}
 ================================================
             ''')
-            analyse_text_basic(selected_file_path)
-            
+            result = analyse_text_basic(selected_file_path)
+
+            total_words = result['total_words']
+            letter_count_space = result['letter_count_space']
+            letter_count = result['letter_count']
+            unique_words = result['unique_words']
+            average_line_word = result['average_line_word']
+            average_line_letter = result['average_line_letter']
+            line_count = result['line_count']
+
+            print(f'The number of words in the file is: {total_words}')
+            print(f'The number of characters(including spaces) in the file is: {letter_count_space}')
+            print(f'The number of characters(NOT including spaces) in the file is: {letter_count}')
+            print(f'The number of unique words is: {unique_words}')
+            print(f'The average words in each line is {average_line_word}')
+            print(f'The average letter in each word is {average_line_letter}')
+            print(f'The number of lines in the file is: {line_count}')
+
+            pasue_choice()
 
 
         case 4:
@@ -501,7 +639,7 @@ word analysis for {selected_file_path}
             analyse_text_word(selected_file_path)
             unique_word_analysis(selected_file_path)
             word_length_distribution(selected_file_path)
-
+            pasue_choice()
 
 
         case 5:
@@ -514,6 +652,16 @@ sentence analysis for {selected_file_path}
             analyse_text_sentence(selected_file_path)
             longest_shortest_sentence(selected_file_path)
 
+            result = longest_shortest_sentence(selected_file_path)
+            longest_sentence = result['longest_sentence']
+            longest_length = result['longest_sentence_length']
+            shortest_sentence = result['shortest_sentence']
+            shortest_length = result['shortest_sentence_length']
+
+            print(f'The longest sentence is: "{longest_sentence}" for {longest_length} characters')
+            print(f'The shortest sentence is "{shortest_sentence}" for {shortest_length} characters')
+            pasue_choice()
+
 
         case 6:
             selected_file_path = file_path_detector(selected_file_path)
@@ -522,6 +670,7 @@ character analysis for {selected_file_path}
 ================================================
             ''')
             character_analysis(selected_file_path)
+            pasue_choice()
 
 
         case 7:
@@ -531,6 +680,7 @@ visualise_statistics for {selected_file_path}
 ================================================
             ''')
             visualise_statistics(selected_file_path)
+            pasue_choice()
 
 
         case 8:
@@ -540,8 +690,31 @@ Saving...
 ================================================
             ''')
             export_statistics(selected_file_path)
+            pasue_choice()
 
 
         case 9:
+            selected_file_path = file_path_detector(selected_file_path)
+            print(f'''
+Readabilty analysis for {selected_file_path}
+================================================
+            ''')
+            readable_score_flesch = round(flesch_reading_ease(selected_file_path) , 2)
+            difficulty_flesch = difficulty_dector_flesch(readable_score_flesch)
+            print('The calculation of Flesch Reading Ease including the syllables of all words, which may cause some deviation for the score.')
+            print(f'''
+    The readable score by Flesch Reading Ease is: {readable_score_flesch}
+    The difficuly for flesch is: {difficulty_flesch}
+''')
+            
+            readable_score_LIX = round(LIX(selected_file_path), 2)
+            difficulty_LIX = difficulty_dector_LIX(readable_score_LIX)
+            print(f'''
+    The readable score by LIX is: {readable_score_LIX}
+    The difficulty for LIX is: {difficulty_LIX}
+''')
+            
+
+        case 10:
             print('Exiting, Goodbye!')
             break
