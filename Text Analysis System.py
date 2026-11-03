@@ -550,11 +550,11 @@ while True:
         case = int(input('Enter your choice: '))
 
     except ValueError:
-        print('Please enter an integer from 1 to 9')
+        print('Please enter an integer from 1 to 10')
         continue
     
     if case < 1 or case > 10:
-        print('Please enter an integer from 1 to 9')
+        print('Please enter an integer from 1 to 10')
         continue
 
 
@@ -713,6 +713,7 @@ Readabilty analysis for {selected_file_path}
     The readable score by LIX is: {readable_score_LIX}
     The difficulty for LIX is: {difficulty_LIX}
 ''')
+            pasue_choice()
             
 
         case 10:
