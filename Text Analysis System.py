@@ -3,14 +3,12 @@ import string
 import matplotlib.pyplot as plt
 import json
 
-selected_file = None
-selected_path = None
-selected_file_path = None
-
 
 #暂停
 def pasue_choice():
     input('Press Enter to continue...')
+
+    
 #路径
 def find_file(path):
     count = 1
@@ -355,6 +353,31 @@ def visualise_statistics(selected_file_path):
     plt.tight_layout()
     plt.show()
 
+    #字母饼状图（Top 9）
+    top_nine_letters = sorted_lower[:9]
+
+    all_letters = top_nine_letters + ['Others']
+
+    values = []
+
+    for letter in top_nine_letters:
+        values.append(lower_library[letter])
+
+    others = sum(lower_library.values()) - sum(values)
+    values.append(others)
+
+    plt.figure(figsize=(8, 8))
+    plt.pie(
+        values,
+        labels=all_letters,
+        autopct='%1.1f%%',
+        startangle=90
+    )
+
+    plt.title('Lowercase Letters Frequency (Top 9) + Others)')
+    plt.tight_layout()
+    plt.show()
+
     #句子
     result = longest_shortest_sentence(selected_file_path)
     length = result['sentence_library']
@@ -519,203 +542,213 @@ def difficulty_dector_LIX(readable_score_LIX):
         difficulty_LIX = 'Very Easy'
 
     return difficulty_LIX
-print('''
-Welcome to The Text Analysis System!
-This programme analyses text files and provides statistical insights.
-''')
 
-while True:
+
+def main():
+
+    selected_file = None
+    selected_path = None
+    selected_file_path = None
+
+
     print('''
-===================================
-            Text Analyser
-===================================
-1. List available text files
-2. Select and analyse a text file
-3. Show basic statistics
-4. Show word analysis
-5. Show sentence analysis
-6. Show character analysis
-7. Visualise statistics
-8. Export statistics
-9. Readable score
-10. Exit
-''')
-    if selected_file_path:
-        print(f'Current file: {selected_file_path}')
-    else:
-        print('No file loaded')
+    Welcome to The Text Analysis System!
+    This programme analyses text files and provides statistical insights.
+    ''')
+
+    while True:
+        print('''
+    ===================================
+                Text Analyser
+    ===================================
+    1. List available text files
+    2. Select and analyse a text file
+    3. Show basic statistics
+    4. Show word analysis
+    5. Show sentence analysis
+    6. Show character analysis
+    7. Visualise statistics
+    8. Export statistics
+    9. Readable score
+    10. Exit
+    ''')
+        if selected_file_path:
+            print(f'Current file: {selected_file_path}')
+        else:
+            print('No file loaded')
 
 
-    try:
-        case = int(input('Enter your choice: '))
+        try:
+            case = int(input('Enter your choice: '))
 
-    except ValueError:
-        print('Please enter an integer from 1 to 10')
-        continue
-    
-    if case < 1 or case > 10:
-        print('Please enter an integer from 1 to 10')
-        continue
-
-
-    match case:
-        case 1:
-    
-            print('Your choice: List available text files')
-            path = input('Please enter the folder path: ')
-            result = find_file(path)
-            if not result:
-                pasue_choice()
-                continue
-            else:
-                selected_file = None
-                selected_file_path = None
-                selected_path = path
-            pasue_choice()
+        except ValueError:
+            print('Please enter an integer from 1 to 10')
+            continue
+        
+        if case < 1 or case > 10:
+            print('Please enter an integer from 1 to 10')
+            continue
 
 
-        case 2:
-
-            if selected_path:
-                path = selected_path
-            else:
+        match case:
+            case 1:
+        
+                print('Your choice: List available text files')
                 path = input('Please enter the folder path: ')
-
-            result = find_file(path)
-            if not result:
-                continue
-
-            choose = correct_choose(result)
-
-            print(f'Your choice is {result[choose]}')
-            selected_file = result[choose]
-            selected_file_path = os.path.join(path, selected_file)
-
-            line_count = line_counter(selected_file_path)
-
-            print(f'Analysing "{selected_file_path}"...')
-            print(f'Analysis complete! Processed {line_count} lines.')
-            print('File selected successfully!')
-
-            line_counter(selected_file_path)
-            pasue_choice()
+                result = find_file(path)
+                if not result:
+                    pasue_choice()
+                    continue
+                else:
+                    selected_file = None
+                    selected_file_path = None
+                    selected_path = path
+                pasue_choice()
 
 
-        case 3:
+            case 2:
 
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f'''
-Basic Satatistics for {selected_file_path}
-================================================
-            ''')
-            result = analyse_text_basic(selected_file_path)
+                if selected_path:
+                    path = selected_path
+                else:
+                    path = input('Please enter the folder path: ')
 
-            total_words = result['total_words']
-            letter_count_space = result['letter_count_space']
-            letter_count = result['letter_count']
-            unique_words = result['unique_words']
-            average_line_word = result['average_line_word']
-            average_line_letter = result['average_line_letter']
-            line_count = result['line_count']
+                result = find_file(path)
+                if not result:
+                    continue
 
-            print(f'The number of words in the file is: {total_words}')
-            print(f'The number of characters(including spaces) in the file is: {letter_count_space}')
-            print(f'The number of characters(NOT including spaces) in the file is: {letter_count}')
-            print(f'The number of unique words is: {unique_words}')
-            print(f'The average words in each line is {average_line_word}')
-            print(f'The average letter in each word is {average_line_letter}')
-            print(f'The number of lines in the file is: {line_count}')
+                choose = correct_choose(result)
 
-            pasue_choice()
+                print(f'Your choice is {result[choose]}')
+                selected_file = result[choose]
+                selected_file_path = os.path.join(path, selected_file)
 
+                line_count = line_counter(selected_file_path)
 
-        case 4:
-            
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f'''
-word analysis for {selected_file_path}
-================================================
-            ''')
-            analyse_text_word(selected_file_path)
-            unique_word_analysis(selected_file_path)
-            word_length_distribution(selected_file_path)
-            pasue_choice()
+                print(f'Analysing "{selected_file_path}"...')
+                print(f'Analysis complete! Processed {line_count} lines.')
+                print('File selected successfully!')
+
+                line_counter(selected_file_path)
+                pasue_choice()
 
 
-        case 5:
+            case 3:
 
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f'''
-sentence analysis for {selected_file_path}
-================================================
-            ''')
-            analyse_text_sentence(selected_file_path)
-            longest_shortest_sentence(selected_file_path)
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f'''
+    Basic Satatistics for {selected_file_path}
+    ================================================
+                ''')
+                result = analyse_text_basic(selected_file_path)
 
-            result = longest_shortest_sentence(selected_file_path)
-            longest_sentence = result['longest_sentence']
-            longest_length = result['longest_sentence_length']
-            shortest_sentence = result['shortest_sentence']
-            shortest_length = result['shortest_sentence_length']
+                total_words = result['total_words']
+                letter_count_space = result['letter_count_space']
+                letter_count = result['letter_count']
+                unique_words = result['unique_words']
+                average_line_word = result['average_line_word']
+                average_line_letter = result['average_line_letter']
+                line_count = result['line_count']
 
-            print(f'The longest sentence is: "{longest_sentence}" for {longest_length} characters')
-            print(f'The shortest sentence is "{shortest_sentence}" for {shortest_length} characters')
-            pasue_choice()
+                print(f'The number of words in the file is: {total_words}')
+                print(f'The number of characters(including spaces) in the file is: {letter_count_space}')
+                print(f'The number of characters(NOT including spaces) in the file is: {letter_count}')
+                print(f'The number of unique words is: {unique_words}')
+                print(f'The average words in each line is {average_line_word}')
+                print(f'The average letter in each word is {average_line_letter}')
+                print(f'The number of lines in the file is: {line_count}')
 
-
-        case 6:
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f'''
-character analysis for {selected_file_path}
-================================================
-            ''')
-            character_analysis(selected_file_path)
-            pasue_choice()
+                pasue_choice()
 
 
-        case 7:
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f''' 
-visualise_statistics for {selected_file_path}
-================================================
-            ''')
-            visualise_statistics(selected_file_path)
-            pasue_choice()
+            case 4:
+                
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f'''
+    word analysis for {selected_file_path}
+    ================================================
+                ''')
+                analyse_text_word(selected_file_path)
+                unique_word_analysis(selected_file_path)
+                word_length_distribution(selected_file_path)
+                pasue_choice()
 
 
-        case 8:
-            selected_file_path = file_path_detector(selected_file_path)
-            print( '''
-Saving...
-================================================
-            ''')
-            export_statistics(selected_file_path)
-            pasue_choice()
+            case 5:
+
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f'''
+    sentence analysis for {selected_file_path}
+    ================================================
+                ''')
+                analyse_text_sentence(selected_file_path)
+
+                result = longest_shortest_sentence(selected_file_path)
+                longest_sentence = result['longest_sentence']
+                longest_length = result['longest_sentence_length']
+                shortest_sentence = result['shortest_sentence']
+                shortest_length = result['shortest_sentence_length']
+
+                print(f'The longest sentence is: "{longest_sentence}" for {longest_length} characters')
+                print(f'The shortest sentence is "{shortest_sentence}" for {shortest_length} characters')
+                pasue_choice()
 
 
-        case 9:
-            selected_file_path = file_path_detector(selected_file_path)
-            print(f'''
-Readabilty analysis for {selected_file_path}
-================================================
-            ''')
-            readable_score_flesch = round(flesch_reading_ease(selected_file_path) , 2)
-            difficulty_flesch = difficulty_dector_flesch(readable_score_flesch)
-            print('The calculation of Flesch Reading Ease including the syllables of all words, which may cause some deviation for the score.')
-            print(f'''
-    The readable score by Flesch Reading Ease is: {readable_score_flesch}
-    The difficuly for flesch is: {difficulty_flesch}
-''')
-            
-            readable_score_LIX = round(LIX(selected_file_path), 2)
-            difficulty_LIX = difficulty_dector_LIX(readable_score_LIX)
-            print(f'''
-    The readable score by LIX is: {readable_score_LIX}
-    The difficulty for LIX is: {difficulty_LIX}
-''')
-            pasue_choice()
-            
+            case 6:
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f'''
+    character analysis for {selected_file_path}
+    ================================================
+                ''')
+                character_analysis(selected_file_path)
+                pasue_choice()
 
-        case 10:
-            print('Exiting, Goodbye!')
-            break
+
+            case 7:
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f''' 
+    visualise_statistics for {selected_file_path}
+    ================================================
+                ''')
+                visualise_statistics(selected_file_path)
+                pasue_choice()
+
+
+            case 8:
+                selected_file_path = file_path_detector(selected_file_path)
+                print( '''
+    Saving...
+    ================================================
+                ''')
+                export_statistics(selected_file_path)
+                pasue_choice()
+
+
+            case 9:
+                selected_file_path = file_path_detector(selected_file_path)
+                print(f'''
+    Readabilty analysis for {selected_file_path}
+    ================================================
+                ''')
+                readable_score_flesch = round(flesch_reading_ease(selected_file_path) , 2)
+                difficulty_flesch = difficulty_dector_flesch(readable_score_flesch)
+                print('The calculation of Flesch Reading Ease including the syllables of all words, which may cause some deviation for the score.')
+                print(f'''
+        The readable score by Flesch Reading Ease is: {readable_score_flesch}
+        The difficuly for flesch is: {difficulty_flesch}
+    ''')
+                
+                readable_score_LIX = round(LIX(selected_file_path), 2)
+                difficulty_LIX = difficulty_dector_LIX(readable_score_LIX)
+                print(f'''
+        The readable score by LIX is: {readable_score_LIX}
+        The difficulty for LIX is: {difficulty_LIX}
+    ''')
+                pasue_choice()
+                
+
+            case 10:
+                print('Exiting, Goodbye!')
+                break
+
+main()
